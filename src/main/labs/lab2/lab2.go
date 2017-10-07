@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	AMOUNT_OF_SHAPES = 20
+	AMOUNT_OF_SHAPES = 200
 	SCALE float64 = 5
-	NU float64 = 0.1
+	NU float64 = 0.08
 )
 
 var (
@@ -211,10 +211,10 @@ func Perform() {
 
 func PerformWithScale(scale float64) {
 	var shapes []types.Shape
-	shapes = append(shapes, CreateInitialShape(INITIAL_SHAPE__RECT))
+	shapes = append(shapes, CreateInitialShape(INITIAL_SHAPE__TRIANGLE))
 	for index := 1; index <= AMOUNT_OF_SHAPES; index++ {
 		shapes = append(shapes, CreateNewShape(shapes[index - 1]))
 	}
 
-	utils.Draw(shapes, scale)
+	utils.DrawByBresenhamAlgorithm(shapes, scale)
 }
