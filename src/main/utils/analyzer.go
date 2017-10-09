@@ -3,7 +3,6 @@ package utils
 import (
 	"main/types"
 	"fmt"
-	"math"
 )
 
 // Cyrus & Beck algorithm
@@ -17,19 +16,15 @@ func GetInsideLinePart(line types.Line, shape types.Shape) []types.Line {
 	//var vectorsP []types.LineVector
 	var vectorsN []types.LineVector = GetShapeSidesVectors(shape)
 
-	fmt.Print("VectorsD: ")
-	fmt.Println(vectorD, vectorD.GetLength())
-	for sideNumber := range shape.Lines {
-		fmt.Print("Value N: ")
-		fmt.Println(vectorsN[sideNumber], vectorsN[sideNumber].GetLength())
+	for sideNumber, edge := range shape.Lines {
 		valueP := vectorsN[sideNumber].MultiplyScalarOnVector(vectorD)
-		angle := math.Acos(vectorsN[sideNumber].GetCosAngleBetweenVector(vectorD)) * 57.29
-		//vectorsP = append(vectorsP, valueP)
-		fmt.Print("Value P: ")
-		fmt.Println(valueP)
-		fmt.Print("Angle : ")
-		fmt.Println(angle)
-		fmt.Println()
+		vectorF, _ := CreateVectorsForLine(edge)
+		t := vectorsN[sideNumber].MultiplyScalarOnVector(vectorBegin.Subtract(vectorF)) /
+			(vectorsN[sideNumber].MultiplyScalarOnVector(vectorEnd.Subtract(vectorBegin))) * -1
+		fmt.Println("P : ", valueP)
+		fmt.Println("t: ", t)
+		//fun := AnalyzePValue(valueP)
+
 	}
 
 	return nil
