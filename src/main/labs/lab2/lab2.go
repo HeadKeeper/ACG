@@ -12,7 +12,7 @@ const (
 )
 
 var (
-	INITIAL_SHAPE__RECT = []types.Side {
+	INITIAL_SHAPE__RECT = []types.Line {
 		{
 			BeginPos: types.Point{
 				X: 50,
@@ -55,7 +55,7 @@ var (
 		},
 	}
 
-	INITIAL_SHAPE__TRIANGLE = []types.Side {
+	INITIAL_SHAPE__TRIANGLE = []types.Line {
 		{
 			BeginPos: types.Point{
 				X: 50,
@@ -88,7 +88,7 @@ var (
 		},
 	}
 
-	INITIAL_SHAPE__FIVEANGLE = []types.Side {
+	INITIAL_SHAPE__FIVEANGLE = []types.Line {
 		{
 			BeginPos: types.Point{
 				X: 25,
@@ -141,7 +141,7 @@ var (
 		},
 	}
 
-	INITIAL_SHAPE__SIXANGLE = []types.Side {
+	INITIAL_SHAPE__SIXANGLE = []types.Line {
 		{
 			BeginPos: types.Point{
 				X: 25,

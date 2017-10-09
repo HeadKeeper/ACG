@@ -23,7 +23,7 @@ func Draw(shapes []types.Shape, scale float64) {
 
 	for _, shape := range shapes {
 		renderer.SetDrawColor(shape.Color.R, shape.Color.G, shape.Color.B, shape.Color.A)
-		for _, side := range shape.Sides {
+		for _, side := range shape.Lines {
 			renderer.DrawLine(
 				int(scale * side.BeginPos.X),
 				int(scale * side.BeginPos.Y),
@@ -120,7 +120,7 @@ func DrawByBresenhamAlgorithm(shapes []types.Shape, scale float64) {
 
 	for _, shape := range shapes {
 		renderer.SetDrawColor(shape.Color.R, shape.Color.G, shape.Color.B, shape.Color.A)
-		for _, side := range shape.Sides {
+		for _, side := range shape.Lines {
 			drawLineByBresenhamAlgorithm(
 				renderer,
 				int(scale * side.BeginPos.X),

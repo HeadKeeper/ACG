@@ -1,6 +1,67 @@
 package lab3
 
-import "github.com/veandco/go-sdl2/sdl"
+import (
+	"github.com/veandco/go-sdl2/sdl"
+	"main/types"
+	"main/utils"
+)
+
+var (
+	RECT = []types.Line {
+		{
+			BeginPos: types.Point{
+				X: 50,
+				Y: 50,
+			},
+			EndPos: types.Point{
+				X: 150,
+				Y: 50,
+			},
+		},
+		{
+			BeginPos: types.Point{
+				X: 150,
+				Y: 50,
+			},
+			EndPos: types.Point{
+				X: 150,
+				Y: 100,
+			},
+		},
+		{
+			BeginPos: types.Point{
+				X: 150,
+				Y: 100,
+			},
+			EndPos: types.Point{
+				X: 50,
+				Y: 100,
+			},
+		},
+		{
+			BeginPos: types.Point{
+				X: 50,
+				Y: 100,
+			},
+			EndPos: types.Point{
+				X: 50,
+				Y: 50,
+			},
+		},
+	}
+
+	LINE = types.Line {
+		BeginPos: types.Point {
+			X: 25,
+			Y: 75,
+		},
+		EndPos: types.Point {
+			X: 175,
+			Y: 125,
+			//Y: 75,
+		},
+	}
+)
 
 func CreateWindows() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
@@ -16,16 +77,19 @@ func CreateWindows() {
 	renderer.SetDrawColor(255, 255, 255, 0)
 	renderer.Clear()
 
-	subWindow, subRenderer, err := sdl.CreateWindowAndRenderer(400, 300, sdl.WINDOW_RESIZABLE)
-	if err != nil {
-		panic(err)
+	shape := types.Shape {
+		Lines: RECT,
+		Color: sdl.Color { 228, 148, 8 , 0 },
 	}
-	defer subWindow.Destroy()
-	subRenderer.SetDrawColor(255, 0, 255, 0)
-	subRenderer.Clear()
+
+	utils.GetInsideLinePart(
+		LINE,
+		shape,
+	)
+
+	utils.Draw([]types.Shape{ shape, {[]types.Line{LINE}, sdl.Color { 148, 8, 228 , 0 }}}, 2)
 
 	renderer.Present()
-	subRenderer.Present()
 
 	sdl.Delay(5000)
 }

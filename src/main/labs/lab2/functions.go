@@ -6,16 +6,16 @@ import (
 	"main/types"
 )
 
-func CreateInitialShape(sides []types.Side) types.Shape {
+func CreateInitialShape(lines []types.Line) types.Shape {
 	return CreateShape(
-		sides,
+		lines,
 		utils.CreateRandomColor(),
 	)
 }
 
-func CreateShape(sides []types.Side, color sdl.Color) types.Shape {
+func CreateShape(lines []types.Line, color sdl.Color) types.Shape {
 	return types.Shape{
-		Sides: sides,
+		Lines: lines,
 		Color: color,
 	}
 }
@@ -37,12 +37,12 @@ func CreateNewShapeWithNu(shape types.Shape, nu float64) types.Shape {
 	)
 }
 
-func createNewSides(nu float64, shape types.Shape) []types.Side {
-	var newSides []types.Side
-	for index := 0; index < len(shape.Sides); index++ {
-		newSideStartPos := getPointFromSide(shape.Sides[index], nu)
-		newSideEndPos := getPointFromSide(getNextSide(index, shape.Sides), nu)
-		newSides = append(newSides, types.Side{
+func createNewSides(nu float64, shape types.Shape) []types.Line {
+	var newSides []types.Line
+	for index := 0; index < len(shape.Lines); index++ {
+		newSideStartPos := getPointFromSide(shape.Lines[index], nu)
+		newSideEndPos := getPointFromSide(utils.GetNextSide(index, shape.Lines), nu)
+		newSides = append(newSides, types.Line{
 			BeginPos: newSideStartPos,
 			EndPos: newSideEndPos,
 		})
@@ -50,12 +50,12 @@ func createNewSides(nu float64, shape types.Shape) []types.Side {
 	return newSides
 }
 
-func getPointFromSide(side types.Side, nu float64) types.Point {
-	pointX := side.BeginPos.X + nu * (side.EndPos.X - side.BeginPos.X)
+func getPointFromSide(line types.Line, nu float64) types.Point {
+	pointX := line.BeginPos.X + nu * (line.EndPos.X - line.BeginPos.X)
 	if pointX < 0 {
 		pointX = pointX * -1
 	}
-	pointY := side.BeginPos.Y + nu * (side.EndPos.Y - side.BeginPos.Y)
+	pointY := line.BeginPos.Y + nu * (line.EndPos.Y - line.BeginPos.Y)
 	if pointY < 0 {
 		pointY = pointY * -1
 	}
@@ -65,17 +65,3 @@ func getPointFromSide(side types.Side, nu float64) types.Point {
 	}
 }
 
-func getNextSideNumber(currentSideNumber int, amountOfSides int) int {
-	var newSideNumber int
-	if currentSideNumber >= amountOfSides - 1 {
-		newSideNumber = 0
-	} else {
-		newSideNumber = currentSideNumber + 1
-	}
-
-	return newSideNumber
-}
-
-func getNextSide(currentSideNumber int, sides []types.Side) types.Side {
-	return sides[getNextSideNumber(currentSideNumber, len(sides))]
-}

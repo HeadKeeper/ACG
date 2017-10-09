@@ -1,6 +1,6 @@
 package types
 
-type Side struct {
+type Line struct {
 	BeginPos Point
 	EndPos Point
 }
