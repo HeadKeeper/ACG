@@ -7,47 +7,97 @@ import (
 )
 
 var (
-	RECT = []types.Line {
-		{
-			BeginPos: types.Point{
-				X: 50,
-				Y: 50,
+	WINDOW = types.Shape {
+
+		Lines: []types.Line {
+			{
+				BeginPos: types.Point {
+					X: 50,
+					Y: 50,
+				},
+				EndPos: types.Point {
+					X: 150,
+					Y: 50,
+				},
 			},
-			EndPos: types.Point{
-				X: 150,
-				Y: 50,
+			{
+				BeginPos: types.Point {
+					X: 150,
+					Y: 50,
+				},
+				EndPos: types.Point {
+					X: 150,
+					Y: 100,
+				},
+			},
+			{
+				BeginPos: types.Point {
+					X: 150,
+					Y: 100,
+				},
+				EndPos: types.Point {
+					X: 50,
+					Y: 100,
+				},
+			},
+			{
+				BeginPos: types.Point {
+					X: 50,
+					Y: 100,
+				},
+				EndPos: types.Point {
+					X: 50,
+					Y: 50,
+				},
 			},
 		},
-		{
-			BeginPos: types.Point{
-				X: 150,
-				Y: 50,
+		Color: sdl.Color { 228, 148, 8 , 0 },
+	}
+
+	EXAMPLE_SHAPE = types.Shape {
+		Lines: []types.Line {
+			{
+				BeginPos: types.Point {
+					X: 30,
+					Y: 30,
+				},
+				EndPos: types.Point {
+					X: 130,
+					Y: 30,
+				},
 			},
-			EndPos: types.Point{
-				X: 150,
-				Y: 100,
+			{
+				BeginPos: types.Point {
+					X: 130,
+					Y: 30,
+				},
+				EndPos: types.Point {
+					X: 130,
+					Y: 80,
+				},
+			},
+			{
+				BeginPos: types.Point {
+					X: 130,
+					Y: 80,
+				},
+				EndPos: types.Point {
+					X: 30,
+					Y: 80,
+				},
+			},
+			{
+				BeginPos: types.Point {
+					X: 30,
+					Y: 80,
+				},
+				EndPos: types.Point {
+					X: 30,
+					Y: 30,
+				},
 			},
 		},
-		{
-			BeginPos: types.Point{
-				X: 150,
-				Y: 100,
-			},
-			EndPos: types.Point{
-				X: 50,
-				Y: 100,
-			},
-		},
-		{
-			BeginPos: types.Point{
-				X: 50,
-				Y: 100,
-			},
-			EndPos: types.Point{
-				X: 50,
-				Y: 50,
-			},
-		},
+		Color: sdl.Color { 144, 228, 8 , 0 },
 	}
 
 	LINE = types.Line {
@@ -60,6 +110,7 @@ var (
 			//Y: 125,
 			Y: 75,
 		},
+		Invisible: false,
 	}
 )
 
@@ -77,17 +128,9 @@ func CreateWindows() {
 	renderer.SetDrawColor(255, 255, 255, 0)
 	renderer.Clear()
 
-	shape := types.Shape {
-		Lines: RECT,
-		Color: sdl.Color { 228, 148, 8 , 0 },
-	}
+	shapeRect := utils.AnalyzeShapeInWindow(EXAMPLE_SHAPE, WINDOW)
 
-	utils.GetInsideLinePart(
-		LINE,
-		shape,
-	)
-
-	utils.Draw([]types.Shape{ shape, {[]types.Line{LINE}, sdl.Color { 148, 8, 228 , 0 }}}, 2)
+	utils.DrawByBresenhamAlgorithm([]types.Shape {WINDOW, shapeRect}, 3)
 
 	renderer.Present()
 

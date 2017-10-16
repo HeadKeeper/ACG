@@ -2,32 +2,82 @@ package utils
 
 import (
 	"main/types"
-	"fmt"
 )
 
 // Cyrus & Beck algorithm
-func GetInsideLinePart(line types.Line, shape types.Shape) []types.Line {
-	//tIn := float64(0)
-	//tOut := float64(1)
+func AnalyzeLineInWindow(line types.Line, window types.Shape) []types.Line {
+	beginT := 0.0
+	endT := 1.0
+	var lines []types.Line
 
 	vectorBegin, vectorEnd := CreateVectorsForLine(line)
 	vectorD := vectorEnd.Subtract(vectorBegin)
 
-	//var vectorsP []types.LineVector
-	var vectorsN []types.LineVector = GetShapeSidesVectors(shape)
+	var vectorsN []types.LineVector = GetShapeSidesVectors(window)
 
-	for sideNumber, edge := range shape.Lines {
+	for sideNumber, edge := range window.Lines {
 		valueP := vectorsN[sideNumber].MultiplyScalarOnVector(vectorD)
 		vectorF, _ := CreateVectorsForLine(edge)
-		t := vectorsN[sideNumber].MultiplyScalarOnVector(vectorBegin.Subtract(vectorF)) /
-			(vectorsN[sideNumber].MultiplyScalarOnVector(vectorEnd.Subtract(vectorBegin))) * -1
-		fmt.Println("P : ", valueP)
-		fmt.Println("t: ", t)
-		//fun := AnalyzePValue(valueP)
+		vectorW := vectorBegin.Subtract(vectorF)
+		valueQ := vectorsN[sideNumber].MultiplyScalarOnVector(vectorW)
+
+   		if valueP == 0 {
+			if valueQ < 0 {
+			//	Outside window
+				line.Invisible = true
+				lines = append(lines, line)
+				return lines
+			}
+		}
+
+		t := -1 * valueQ / valueP
+		if t > 1 || t < 0 {
+			//	T is outside window
+			continue
+		}
+
+		if valueP < 0 && beginT <= t && endT > t {
+			endT = t
+		}
+
+		if valueP > 0 && endT >= t && beginT < t {
+			beginT = t
+		}
 
 	}
 
-	return nil
+	lineParameter := GetLineParameterVersion(line)
+
+	if beginT != 0 {
+		lines = append(lines, types.Line{
+			BeginPos:  lineParameter(0),
+			EndPos:    lineParameter(beginT),
+			Invisible: true,
+		})
+	}
+	lines = append(lines, types.Line{
+		BeginPos:  lineParameter(beginT),
+		EndPos:    lineParameter(endT),
+	})
+	if endT != 1 {
+		lines = append(lines, types.Line{
+			BeginPos:  lineParameter(endT),
+			EndPos:    lineParameter(1),
+			Invisible: true,
+		})
+	}
+
+	return lines
+}
+
+func AnalyzeShapeInWindow(shape types.Shape, window types.Shape) types.Shape {
+	var newShape types.Shape
+	newShape.Color = shape.Color
+
+	for lineIndex := range shape.Lines {
+		newShape.Lines = append(newShape.Lines, AnalyzeLineInWindow(shape.Lines[lineIndex], window)...)
+	}
+	return newShape
 }
 
 func GetShapeSidesVectors(shape types.Shape) []types.LineVector {
@@ -78,4 +128,13 @@ func GetNextSide(currentSideNumber int, sides []types.Line) types.Line {
 
 func GetPrevSide(currentSideNumber int, sides []types.Line) types.Line {
 	return sides[GetPrevSideNumber(currentSideNumber, len(sides))]
+}
+
+func GetLineParameterVersion(line types.Line) func(t float64) types.Point {
+	return func(t float64) types.Point {
+		return types.Point{
+			Y: line.BeginPos.Y + (line.EndPos.Y - line.BeginPos.Y) * t,
+			X: line.BeginPos.X + (line.EndPos.X - line.BeginPos.X) * t,
+		}
+	}
 }

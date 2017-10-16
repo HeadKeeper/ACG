@@ -39,6 +39,10 @@ func Draw(shapes []types.Shape, scale float64) {
 }
 
 func drawLineByBresenhamAlgorithm(renderer *sdl.Renderer, x1 int, y1 int, x2 int, y2 int, color sdl.Color) {
+	drawDashedLineByBresenhamAlgorithm(renderer, x1, y1, x2, y2, color, 1)
+}
+
+func drawDashedLineByBresenhamAlgorithm(renderer *sdl.Renderer, x1 int, y1 int, x2 int, y2 int, color sdl.Color, spaceLength int) {
 	renderer.SetDrawColor(color.R, color.G, color.B, color.A)
 
 	dx := int(math.Abs(float64(x2 - x1)))
@@ -67,17 +71,16 @@ func drawLineByBresenhamAlgorithm(renderer *sdl.Renderer, x1 int, y1 int, x2 int
 
 		x := x1 + sx
 		y := y1
-		for i := 1; i <= dx; i ++ {
+		for i := 1; i <= dx; i += spaceLength {
 			if d > 0 {
 				d += d2
 				y += sy
 			} else {
 				d += d1
 			}
-
 			renderer.DrawPoint(x, y)
 
-			x += sx
+			x += spaceLength * sx
 		}
 	} else {
 		d := (dx << 1) - dy
@@ -88,7 +91,7 @@ func drawLineByBresenhamAlgorithm(renderer *sdl.Renderer, x1 int, y1 int, x2 int
 
 		x := x1
 		y := y1 + sy
-		for i := 1; i <= dy; i ++ {
+		for i := 1; i <= dy; i += spaceLength {
 			if d > 0 {
 				d += d2
 				x += sx
@@ -98,7 +101,7 @@ func drawLineByBresenhamAlgorithm(renderer *sdl.Renderer, x1 int, y1 int, x2 int
 
 			renderer.DrawPoint(x, y)
 
-			y += sy
+			y += spaceLength * sy
 		}
 	}
 }
@@ -121,14 +124,26 @@ func DrawByBresenhamAlgorithm(shapes []types.Shape, scale float64) {
 	for _, shape := range shapes {
 		renderer.SetDrawColor(shape.Color.R, shape.Color.G, shape.Color.B, shape.Color.A)
 		for _, side := range shape.Lines {
-			drawLineByBresenhamAlgorithm(
-				renderer,
-				int(scale * side.BeginPos.X),
-				int(scale * side.BeginPos.Y),
-				int(scale * side.EndPos.X),
-				int(scale * side.EndPos.Y),
-				shape.Color,
-			)
+			if !side.Invisible {
+				drawLineByBresenhamAlgorithm(
+					renderer,
+					int(scale*side.BeginPos.X),
+					int(scale*side.BeginPos.Y),
+					int(scale*side.EndPos.X),
+					int(scale*side.EndPos.Y),
+					shape.Color,
+				)
+			} else {
+				drawDashedLineByBresenhamAlgorithm(
+					renderer,
+					int(scale*side.BeginPos.X),
+					int(scale*side.BeginPos.Y),
+					int(scale*side.EndPos.X),
+					int(scale*side.EndPos.Y),
+					shape.Color,
+					2,
+				)
+			}
 		}
 	}
 

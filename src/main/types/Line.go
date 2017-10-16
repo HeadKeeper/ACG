@@ -1,6 +1,7 @@
 package types
 
 type Line struct {
-	BeginPos Point
-	EndPos Point
+	BeginPos  Point
+	EndPos    Point
+	Invisible bool
 }
