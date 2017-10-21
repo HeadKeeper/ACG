@@ -7,5 +7,5 @@ import (
 
 func main() {
 	//lab2.Perform()
-	lab3.CreateWindows()
+	lab3.Perform()
 }

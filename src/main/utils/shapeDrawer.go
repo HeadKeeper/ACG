@@ -106,8 +106,8 @@ func drawDashedLineByBresenhamAlgorithm(renderer *sdl.Renderer, x1 int, y1 int, 
 	}
 }
 
-func DrawByBresenhamAlgorithm(shapes []types.Shape, scale float64) {
-	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
+func DrawByBresenhamAlgorithm(renderer *sdl.Renderer, shapes []types.Shape, scale float64) {
+	/*if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
 	defer sdl.Quit()
@@ -120,7 +120,7 @@ func DrawByBresenhamAlgorithm(shapes []types.Shape, scale float64) {
 
 	renderer.SetDrawColor(255, 255, 255, 0)
 	renderer.Clear()
-
+*/
 	for _, shape := range shapes {
 		renderer.SetDrawColor(shape.Color.R, shape.Color.G, shape.Color.B, shape.Color.A)
 		for _, side := range shape.Lines {
@@ -149,5 +149,22 @@ func DrawByBresenhamAlgorithm(shapes []types.Shape, scale float64) {
 
 	renderer.Present()
 
-	sdl.Delay(5000)
+	//sdl.Delay(5000)
+}
+
+func DrawShape(renderer *sdl.Renderer, shape types.Shape, scale float64) {
+
+}
+
+func UpdateShapes(renderer *sdl.Renderer, shapes []types.Shape, scale float64)  {
+	renderer.SetDrawColor(255, 255, 255, 0)
+	renderer.Clear()
+
+	for index := range shapes {
+		if index == 0 { continue }
+		shapes[index] = AnalyzeShapeInWindow(shapes[index], shapes[0])
+	}
+	DrawByBresenhamAlgorithm(renderer, shapes, scale)
+
+	renderer.Present()
 }

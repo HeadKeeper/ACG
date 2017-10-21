@@ -112,9 +112,12 @@ var (
 		},
 		Invisible: false,
 	}
+
+	SCALE = 3.0
+	ROTATE_ANGLE = 2.0
 )
 
-func CreateWindows() {
+func Perform() {
 	if err := sdl.Init(sdl.INIT_EVERYTHING); err != nil {
 		panic(err)
 	}
@@ -128,11 +131,88 @@ func CreateWindows() {
 	renderer.SetDrawColor(255, 255, 255, 0)
 	renderer.Clear()
 
-	shapeRect := utils.AnalyzeShapeInWindow(EXAMPLE_SHAPE, WINDOW)
+	var animatedShape types.Animation
+	var shapesToDrawing []types.Shape
+	var currentShape types.Shape
 
-	utils.DrawByBresenhamAlgorithm([]types.Shape {WINDOW, shapeRect}, 3)
+	animatedShape.Setup(EXAMPLE_SHAPE)
+	EXAMPLE_SHAPE = utils.AnalyzeShapeInWindow(EXAMPLE_SHAPE, WINDOW)
+	shapesToDrawing = append(shapesToDrawing, WINDOW, EXAMPLE_SHAPE)
+	utils.UpdateShapes(renderer, shapesToDrawing, SCALE)
 
-	renderer.Present()
+	mousePressed := false
+	prevMouseX := 0
+	prevMouseY := 0
 
-	sdl.Delay(5000)
+	stop := false
+	lastTime := uint32(0)
+
+	for !stop {
+		currentTime := sdl.GetTicks()
+
+		if animatedShape.Playing {
+			if currentTime - lastTime > 50 {
+				animatedShape.Play()
+				utils.UpdateShapes(renderer, shapesToDrawing, SCALE)
+				lastTime = currentTime
+			}
+		}
+
+		if mousePressed {
+			mouseX, mouseY, _ := sdl.GetMouseState()
+			dx := mouseX - prevMouseX
+			dy := mouseY - prevMouseY
+
+			prevMouseX = mouseX
+			prevMouseY = mouseY
+
+			if currentTime - lastTime > 50 {
+				currentShape.Rotate(ROTATE_ANGLE)
+				lastTime = currentTime
+			}
+
+			currentShape.Move(float64(dx), float64(dy))
+
+			utils.UpdateShapes(renderer, shapesToDrawing, SCALE)
+		}
+
+
+		ev := sdl.WaitEvent()
+		if ev == nil {
+			sdl.Delay(1000)
+			continue
+		}
+		switch ev.(type) {
+		case *sdl.QuitEvent:
+			stop = true
+			break
+		case *sdl.KeyDownEvent:
+			stop = true
+			break
+		case *sdl.MouseButtonEvent:
+			switch ev.(*sdl.MouseButtonEvent).Button {
+			case sdl.BUTTON_LEFT:
+				if mousePressed {
+					mousePressed = false
+				} else {
+					if !animatedShape.Playing {
+						mouseX, mouseY, _ := sdl.GetMouseState()
+						shape := utils.GetTargetShape(shapesToDrawing, float64(mouseX), float64(mouseY))
+						mousePressed = true
+						prevMouseX = mouseX
+						prevMouseY = mouseY
+						currentShape = shape
+					}
+				}
+			default:
+				continue
+			}
+		/*case *sdl.MouseMotionEvent:
+			mouseX, mouseY, _ := sdl.GetMouseState()
+			prevMouseX = mouseX
+			prevMouseY = mouseY*/
+		default:
+			continue
+		}
+	}
 }

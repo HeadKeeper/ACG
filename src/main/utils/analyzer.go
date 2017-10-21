@@ -36,11 +36,11 @@ func AnalyzeLineInWindow(line types.Line, window types.Shape) []types.Line {
 			continue
 		}
 
-		if valueP < 0 && beginT <= t && endT > t {
+		if valueP < 0 && endT > t {
 			endT = t
 		}
 
-		if valueP > 0 && endT >= t && beginT < t {
+		if valueP > 0 && beginT < t {
 			beginT = t
 		}
 
@@ -78,6 +78,40 @@ func AnalyzeShapeInWindow(shape types.Shape, window types.Shape) types.Shape {
 		newShape.Lines = append(newShape.Lines, AnalyzeLineInWindow(shape.Lines[lineIndex], window)...)
 	}
 	return newShape
+}
+
+func AnalyzeShapeToShape(firstShape types.Shape, secondShape types.Shape) (types.Shape, types.Shape) {
+	var window types.Shape
+	var newShape types.Shape
+
+	firstShapeWindow := firstShape.ZIndex < secondShape.ZIndex
+	if firstShapeWindow {
+		window = firstShape
+		newShape = AnalyzeShapeInWindow(secondShape, window)
+	} else {
+		window = secondShape
+		newShape = AnalyzeShapeInWindow(firstShape, window)
+	}
+
+	return newShape, window
+}
+
+func GetTargetShape(shapes []types.Shape, mouseX float64, mouseY float64) types.Shape {
+	mousePoint := types.Point {
+		X: mouseX,
+		Y: mouseY,
+	}
+
+	targetShapeIdx := 1
+	minLength := shapes[1].GetCenter().GetLength(mousePoint)
+	for idx, shape := range shapes {
+		if idx == 0 { continue }
+		if shape.GetCenter().GetLength(mousePoint) < minLength {
+			targetShapeIdx = idx
+		}
+	}
+
+	return shapes[targetShapeIdx]
 }
 
 func GetShapeSidesVectors(shape types.Shape) []types.LineVector {
