@@ -1,4 +1,4 @@
-package lab4
+package lab6WithoutGLUT
 
 import (
 	"strings"
@@ -97,7 +97,7 @@ func Initialize(width, height int, title string, openGLMajor, openGLMinor int, v
 	gl.BindFragDataLocation(program, 0, gl.Str("outputColor\x00"))
 
 	// Load the texture
-	texture, err := newTexture("square.png")
+	texture, err := newTexture(texturePath)
 	if err != nil {
 		log.Fatalln(err)
 	}

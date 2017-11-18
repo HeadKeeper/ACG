@@ -1,4 +1,4 @@
-package lab4
+package lab6WithoutGLUT
 
 const (
 	width  = 500
@@ -26,7 +26,7 @@ func Perform() {
 var cubeVertices = []float32{
 	//  X, Y, Z, U, V
 	// Bottom
-	-1.0, -1.0, -1.0, 0.0, 0.0,
+	-0.5, -1.0, -1.0, 0.0, 0.0,
 	1.0, -1.0, -1.0, 1.0, 0.0,
 	-1.0, -1.0, 1.0, 0.0, 1.0,
 	1.0, -1.0, -1.0, 1.0, 0.0,
