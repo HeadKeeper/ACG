@@ -9,10 +9,10 @@ import (
 )
 
 func main() {
-	makeLab6()
+	//makeLab6()
 	//makeLab6WithoutGlut()
 	//makeTriangleExample()
-	//makeCubeExample()
+	makeCubeExample()
 	//makeGLUTExample()
 }
 

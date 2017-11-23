@@ -13,10 +13,26 @@ import (
 	"github.com/go-gl/gl/v3.3-core/gl"
 	"github.com/go-gl/glfw/v3.2/glfw"
 	"github.com/go-gl/mathgl/mgl32"
+	"math"
 )
 
 const windowWidth = 800
 const windowHeight = 600
+
+var (
+	// Camera
+	cameraPos = mgl32.Vec3{0.0, 0.0, 8.0}
+	cameraFront = mgl32.Vec3{0.0, 0.0, -1.0}
+	cameraUp = mgl32.Vec3{0.0, 1.0, 1.0}
+
+	keys [1024]bool
+	firstMouse = true
+	mousePressed = false
+	yaw = float32(-90.0)
+	pitch = float32(0.0)
+	lastX = float64(windowWidth / 2.0)
+	lastY = float64(windowHeight / 2.0)
+)
 
 func init() {
 	// GLFW event handling must run on the main OS thread
@@ -27,17 +43,73 @@ func onKey(w *glfw.Window, key glfw.Key, scancode int, action glfw.Action, mods 
 	if key == glfw.KeyEscape && action == glfw.Press {
 		w.SetShouldClose(true)
 	}
-	if key == glfw.KeyUp && action == glfw.Press {
-
+	if key >= 0 && key < 1024 {
+		if action == glfw.Press {
+			keys[key] = true
+		} else if action == glfw.Release {
+			keys[key] = false
+		}
 	}
-	if key == glfw.KeyRight && action == glfw.Press {
+}
 
+func onMouse(w *glfw.Window, xPos float64, yPos float64)  {
+	if mousePressed {
+		if firstMouse {
+			lastX = xPos
+			lastY = yPos
+			firstMouse = false
+		}
+
+		xOffset := float32(xPos - lastX)
+		yOffset := float32(lastY - yPos) // Reversed since y-coordinates go from bottom to left
+		lastX = xPos
+		lastY = yPos
+
+		sensitivity := float32(0.03) // Change this value to your liking
+		xOffset *= sensitivity
+		yOffset *= sensitivity
+
+		yaw += xOffset
+		pitch += yOffset
+
+		// Make sure that when pitch is out of bounds, screen doesn't get flipped
+		if pitch > 89.0 {
+			pitch = 89.0
+		}
+		if pitch < -89.0 {
+			pitch = -89.0
+		}
+
+		front := mgl32.Vec3{
+			float32(math.Cos(float64(mgl32.DegToRad(yaw)) * math.Cos(float64(mgl32.DegToRad(pitch))))),
+			float32(math.Sin(float64(mgl32.DegToRad(pitch)))),
+			float32(math.Sin(float64(mgl32.DegToRad(yaw)) * math.Cos(float64(mgl32.DegToRad(pitch))))),
+		}
+		cameraFront = front.Normalize()
 	}
-	if key == glfw.KeyDown && action == glfw.Press {
+}
 
+func onMouseButton(w *glfw.Window, button glfw.MouseButton, action glfw.Action, mod glfw.ModifierKey)  {
+	if button == glfw.MouseButtonLeft && action == glfw.Press {
+		mousePressed = true
+	} else if button == glfw.MouseButtonLeft && action == glfw.Release {
+		mousePressed = false
 	}
-	if key == glfw.KeyLeft && action == glfw.Press {
+}
 
+func doMovement() {
+	var cameraSpeed float32 = 0.1
+	if keys[glfw.KeyUp] {
+		cameraPos = cameraPos.Add(cameraFront.Mul(cameraSpeed))
+	}
+	if keys[glfw.KeyDown] {
+		cameraPos = cameraPos.Sub(cameraFront.Mul(cameraSpeed))
+	}
+	if keys[glfw.KeyLeft] {
+		cameraPos = cameraPos.Sub(cameraFront.Cross(cameraUp).Normalize().Mul(cameraSpeed))
+	}
+	if keys[glfw.KeyRight] {
+		cameraPos = cameraPos.Add(cameraFront.Cross(cameraUp).Normalize().Mul(cameraSpeed))
 	}
 }
 
@@ -58,6 +130,8 @@ func StartCube() {
 	}
 	window.MakeContextCurrent()
 	window.SetKeyCallback(onKey)
+	window.SetCursorPosCallback(onMouse)
+	window.SetMouseButtonCallback(onMouseButton)
 
 	// Initialize Glow
 	if err := gl.Init(); err != nil {
@@ -75,7 +149,7 @@ func StartCube() {
 
 	gl.UseProgram(program)
 
-	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 10.0)
+	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 100.0)
 	projectionUniform := gl.GetUniformLocation(program, gl.Str("projection\x00"))
 	gl.UniformMatrix4fv(projectionUniform, 1, false, &projection[0])
 
@@ -125,7 +199,9 @@ func StartCube() {
 	previousTime := glfw.GetTime()
 
 	for !window.ShouldClose() {
-		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
+		doMovement()
+
+		gl.Clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT) // Clear data for new frame
 
 		// Update
 		time := glfw.GetTime()
@@ -133,11 +209,18 @@ func StartCube() {
 		previousTime = time
 
 		angle += elapsed
-		model = mgl32.HomogRotate3D(float32(angle), mgl32.Vec3{0, 1, 0})
+
+		model = mgl32.HomogRotate3D(float32(angle), mgl32.Vec3{0.1, 1, 0})
+		camera = mgl32.LookAtV(
+			cameraPos,
+			cameraPos.Add(cameraFront),
+			cameraUp,
+		)
 
 		// Render
 		gl.UseProgram(program)
 		gl.UniformMatrix4fv(modelUniform, 1, false, &model[0])
+		gl.UniformMatrix4fv(cameraUniform, 1, false, &camera[0])
 
 		gl.BindVertexArray(vao)
 
@@ -322,27 +405,3 @@ var cubeVertices = []float32{
 	1.0, 1.0, -1.0, 0.0, 0.0,
 	1.0, 1.0, 1.0, 0.0, 1.0,
 }
-
-/*
-// Set the working directory to the root of Go package, so that its assets can be accessed.
-func init() {
-	dir, err := importPathToDir("github.com/go-gl/example/gl41core-cube")
-	if err != nil {
-		log.Fatalln("Unable to find Go package in your GOPATH, it's needed to load assets:", err)
-	}
-	err = os.Chdir(dir)
-	if err != nil {
-		log.Panicln("os.Chdir:", err)
-	}
-}
-
-// importPathToDir resolves the absolute path from importPath.
-// There doesn't need to be a valid Go package inside that import path,
-// but the directory must exist.
-func importPathToDir(importPath string) (string, error) {
-	p, err := build.Import(importPath, "", build.FindOnly)
-	if err != nil {
-		return "", err
-	}
-	return p.Dir, nil
-}*/
