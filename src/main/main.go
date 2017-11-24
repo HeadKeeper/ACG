@@ -3,7 +3,7 @@ package main
 import (
 	"main/lab6WithoutGLUT"
 	"main/example/triangle"
-	"main/example/cube"
+	"main/cube"
 	"main/example/withGLUT"
 	"main/lab6"
 )

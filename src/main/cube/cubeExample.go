@@ -186,7 +186,7 @@ func configureWindow() (uint32, mgl32.Mat4, int32, mgl32.Mat4, int32, mgl32.Mat4
 	gl.DepthFunc(gl.LESS)
 	gl.ClearColor(1.0, 1.0, 1.0, 1.0)
 
-	program := NewShaderProgram("./shaders/object.vertex.shader", "./shaders/object.fragment.shader")
+	program := NewShaderProgram("object.vertex.shader", "object.fragment.shader")
 	gl.UseProgram(program)
 
 	projection := mgl32.Perspective(mgl32.DegToRad(45.0), float32(windowWidth)/windowHeight, 0.1, 100.0)
@@ -211,7 +211,7 @@ func configureWindow() (uint32, mgl32.Mat4, int32, mgl32.Mat4, int32, mgl32.Mat4
 }
 
 func configureLight() (uint32) {
-	program := NewShaderProgram("./shaders/lamp.vertex.shader", "./shaders/lamp.fragment.shader")
+	program := NewShaderProgram("lamp.vertex.shader", "lamp.fragment.shader")
 
 	gl.UseProgram(program)
 

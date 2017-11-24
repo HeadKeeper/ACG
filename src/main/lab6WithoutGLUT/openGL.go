@@ -112,7 +112,7 @@ func Initialize(width, height int, title string, openGLMajor, openGLMinor int, v
 	gl.BindBuffer(gl.ARRAY_BUFFER, vbo)
 	gl.BufferData(gl.ARRAY_BUFFER, len(shapeVertices)*4, gl.Ptr(shapeVertices), gl.STATIC_DRAW)
 
-	vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vert\x00")))
+	vertAttrib := uint32(gl.GetAttribLocation(program, gl.Str("vertexIn\x00")))
 	gl.EnableVertexAttribArray(vertAttrib)
 	gl.VertexAttribPointer(vertAttrib, 3, gl.FLOAT, false, 5*4, gl.PtrOffset(0))
 
