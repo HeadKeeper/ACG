@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(first)
+project(lab6)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -10,6 +10,7 @@ set (
         main.cpp
         Shader.h
         Camera.h
+        ./libs/stb_image.h
 )
 add_executable(lab6 ${SOURCE_FILES})
 
@@ -17,6 +18,7 @@ configure_file(./shaders/lamp.vertex.shader ./shaders/lamp.vertex.shader COPYONL
 configure_file(./shaders/lamp.fragment.shader ./shaders/lamp.fragment.shader COPYONLY)
 configure_file(./shaders/lighting.vertex.shader ./shaders/lighting.vertex.shader COPYONLY)
 configure_file(./shaders/lighting.fragment.shader ./shaders/lighting.fragment.shader COPYONLY)
+configure_file(./textures/square.png ./textures/square.png COPYONLY)
 
 # opengl
 find_package(OpenGL REQUIRED)
